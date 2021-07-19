@@ -1,0 +1,57 @@
+﻿@page "/"
+@using System.IO;
+@using x12interpretor;
+
+<h1>X12 EDI Interpretor</h1>
+<div class="drag-drop-zone">
+    <InputFile OnChange="fileChange"></InputFile>
+    @((MarkupString)fileDragDrop)
+</div>
+
+<div class="flex-container">
+    <div class="flex-item-left" ondrop="event.preventDefault()">
+        @foreach (var line in Results.Lines)
+        {
+        <X12TextLine MouseOvered=@mouseOvered Line=line></X12TextLine>
+        }
+    </div>
+    <div class="flex-item-right">
+        @((MarkupString)bubbleUp)
+    </div>
+</div>
+
+@code {
+    private string fileDragDrop { get; set; }
+    private Interpretor interp = new Interpretor();
+
+    public string bubbleUp { get; set; }
+
+    public void mouseOvered(string info)
+    {
+        bubbleUp = info;
+        StateHasChanged();
+    }
+
+    public Index()
+    {
+        fileDragDrop = "You can drag/drop the 850 file &nbsp;<em>here</em>, or click to browse for the file.";
+    }
+
+    public x12interpretor.Models.x12fileResult Results = new x12interpretor.Models.x12fileResult();
+
+    public async Task fileChange(InputFileChangeEventArgs dea)
+    {
+        Results.Lines = new List<x12interpretor.Models.x12lineResult>();
+        StateHasChanged();
+
+        var file = dea.File;
+        fileDragDrop = file.Name;
+
+        using var rdr = new StreamReader(file.OpenReadStream());
+        var info = await rdr.ReadToEndAsync();
+
+        Results = interp.ProcessFile(info);
+
+        StateHasChanged();
+    }
+}
