@@ -18,22 +18,10 @@
     public EventCallback<string> MouseOvered { get; set; }
 
 
-    private x12interpretor.Models.x12field fieldInfo;
     // input fields
     [Parameter]
-    public x12interpretor.Models.x12field FieldInfo 
-    {
-        get
-        {
-            return fieldInfo;
-        }
-        set
-        {
-            fieldInfo = value;
+    public x12interpretor.Models.x12field FieldInfo { get; set; }
 
-            Task.WaitAll(new Task[1] { Task.Run(async () => await onMouseOver()) });
-        }
-    }
     [Parameter]
     public string LineCode { get; set; }
     [Parameter]
