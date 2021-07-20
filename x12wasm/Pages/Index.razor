@@ -83,18 +83,19 @@
     // change the UI mode for all loaded files
     public void switchMode(MouseEventArgs eventArgs)
     {
+        inFocusMode = !inFocusMode;
+
         foreach (var result in ResultSet)
         {
             setModeOnResult(result);
         }
-        inFocusMode = !inFocusMode;
     }
 
     // change a result UI mode
     private void setModeOnResult(x12fileResult result)
     {
         // later on - make this more dynamic
-        if (!inFocusMode)
+        if (inFocusMode)
         {
             var fm = new x12wasm.LineFormtters.FocusModeLineFormatter();
             foreach (var line in result.Lines)
@@ -116,14 +117,20 @@
     public async Task fileChange(InputFileChangeEventArgs dea)
     {
         var files = dea.GetMultipleFiles(5);
+
+        fileDragDrop = $"Processing {files.Count}";
+
         foreach (var file in files)
         {
             await processFile(file);
         }
 
+        StateHasChanged();
+
         // make first file loaded the active
         await updateCurrent(ResultSet[0]);
-                
+        StateHasChanged();
+        fileDragDrop = "You can drag/drop multiple 850 files &nbsp;<em>here</em>, or click to browse for the file.";
         StateHasChanged();
     }
 
