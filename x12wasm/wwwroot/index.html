@@ -13,10 +13,16 @@
     <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
 
     <script>
-        function intiTooltips() {
-            $('[data-toggle="tooltip"]').tooltip();
-            $('[data-toggle="tooltip"]')
-                .tooltip('_fixTitle');
+        window.clipboardCopy = {
+            copyText: function (codeElement) {
+                navigator.clipboard.writeText(codeElement)
+                    .then(function () {
+                        alert("Copied to clipboard!");
+                })
+                .catch(function (error) {
+                    alert(error);
+                });
+            }
         }
     </script>
 </head>

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using x12interpretor.LinePostProcessors;
 using x12interpretor.Models;
 
 namespace x12interpretor.LineProcessors
@@ -9,7 +10,11 @@ namespace x12interpretor.LineProcessors
         public x12line(string lineCode)
         {
             LineCode = lineCode;
+            PostProcessors = new List<Ix12linePostProcessor>();
         }
+
+        public List<Ix12linePostProcessor> PostProcessors { get; set; }
+
         public string LineCode { get; set; }
         public string CodeDescription { get; set; }
 
@@ -22,7 +27,7 @@ namespace x12interpretor.LineProcessors
             {
                 LineCode = this.LineCode,
                 OriginalValue = line,
-                Fields = processParts(parts)
+                FieldResults = processParts(parts)
             };
         }
 
@@ -37,7 +42,8 @@ namespace x12interpretor.LineProcessors
                 results.Add(new x12fieldResult()
                 {
                     Field = field,
-                    FileValue = string.IsNullOrWhiteSpace(parts[field.Ordinal]) ? null : parts[field.Ordinal]
+                    FileValue = string.IsNullOrWhiteSpace(parts[field.Ordinal]) ? null : parts[field.Ordinal],
+                    DisplayValue = string.IsNullOrWhiteSpace(parts[field.Ordinal]) ? null : parts[field.Ordinal]
                 });
             }
 

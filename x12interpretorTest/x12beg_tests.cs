@@ -32,8 +32,8 @@ namespace x12interpretorTest
 
             Assert.Equal(line, results.OriginalValue);
             Assert.Equal("BEG", results.LineCode);
-            Assert.Equal(expected, results.Fields[expectedField - 1].FileValue);
-            Assert.Equal(expectedField, results.Fields[expectedField - 1].Field.Ordinal);
+            Assert.Equal(expected, results.FieldResults[expectedField - 1].FileValue);
+            Assert.Equal(expectedField, results.FieldResults[expectedField - 1].Field.Ordinal);
         }
     }
 }

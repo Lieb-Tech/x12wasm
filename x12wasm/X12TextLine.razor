@@ -1,24 +1,23 @@
 ﻿@using x12interpretor.Models
 
 <div>
-    @if (Line is not null && Line.Fields is not null)
+    @if (Line is not null && Line.FieldResults is not null)
     {       
-    <X12TextField TextName=@Line.LineCode />
-        
-        @foreach (var field in Line.Fields)
+        @foreach (var field in Line.FieldResults)
         {
             <X12TextField 
                           FieldInfo=@field.Field
-                          TextName=@field.FileValue
-
+                          FieldValue=@field.DisplayValue
+                          ExtraValues=@field.ExtraValues
                           LineCode=@Line.LineCode                          
 
+                          Clicked=@clicked
                           LineInfo=@setInfo
                           MouseOvered=@mouseOvered    
                           />
         }
         
-        <div class="lineInfo">@LineInfo</div>
+        <div class="lineInfo">@Line.LineSuffix</div>       
     }
 </div>
 
@@ -27,9 +26,17 @@
     public EventCallback<string> MouseOvered { get; set; }
 
     [Parameter]
+    public EventCallback<string> Clicked { get; set; }
+
+    [Parameter]
     public x12lineResult Line { get; set; }
 
     private string LineInfo { get; set; }
+
+    private async Task clicked(string info)
+    {
+        await Clicked.InvokeAsync(info);
+    }
 
     private async Task mouseOvered(string info)
     {

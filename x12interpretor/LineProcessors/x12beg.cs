@@ -14,6 +14,16 @@ namespace x12interpretor.LineProcessors
             {
                 new x12field()
                 {
+                    Ordinal = 0,
+                    FieldName = "BEG - Transactioal beginning Segment for Purchase Order",
+                    Format = x12fieldFormat.AlphaNumeric,
+                    IsRequired = true,
+                    MaxLen = 3,
+                    MinLen = 2
+                },
+
+                new x12field()
+                {
                     Ordinal = 1,
                     FieldName = "Transaction Set Purpose Code",
                     Format = x12fieldFormat.Numeric,

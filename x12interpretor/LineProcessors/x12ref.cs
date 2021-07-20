@@ -14,6 +14,16 @@ namespace x12interpretor.LineProcessors
             {
                 new x12field()
                 {
+                    Ordinal = 0,
+                    FieldName = "REF - Reference Idenification",
+                    Format = x12fieldFormat.AlphaNumeric,
+                    IsRequired = true,
+                    MaxLen = 3,
+                    MinLen = 2
+                },
+
+                new x12field()
+                {
                     Ordinal = 1,
                     FieldName = "Reference Identifier Code",
                     Format = x12fieldFormat.AlphaNumeric,

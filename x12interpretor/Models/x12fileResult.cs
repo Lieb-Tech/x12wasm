@@ -9,6 +9,8 @@ namespace x12interpretor.Models
     public class x12fileResult
     {
         public bool Error { get; set; }
+
+        public string FileName { get; set; }
         public List<x12lineResult> Lines { get; set; }
 
         public x12fileResult()

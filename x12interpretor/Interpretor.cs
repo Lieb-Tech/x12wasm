@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using x12interpretor.LineProcessors;
 using x12interpretor.Models;
 
@@ -20,7 +21,7 @@ namespace x12interpretor
             processors.Add(new x12ctt());
         }
 
-        public x12fileResult ProcessFile(string file)
+        public async Task<x12fileResult> ProcessFileAsync(string file)
         {
             var result = new x12fileResult() { Error = true };
             bool hasTilda = file.IndexOf('~') > -1;
@@ -37,7 +38,7 @@ namespace x12interpretor
 
             foreach (var  line in lines)
             {
-                var lineResult = ProcessLine(line);                
+                var lineResult = await ProcessLineAsync(line);                
                 lineResult.OriginalLineNumber = result.Lines.Count + 1;
 
                 if (lineResult is not null)
@@ -47,7 +48,7 @@ namespace x12interpretor
             return result;
         }
 
-        protected x12lineResult ProcessLine(string line)
+        protected async Task<x12lineResult> ProcessLineAsync(string line)
         {          
             var processor = getProcessor(line);
 
@@ -55,7 +56,15 @@ namespace x12interpretor
                 return new x12lineResult() { OriginalValue = line };
 
             var result = processor.ProcessLine(line);
-            result.LineDescription = processor.CodeDescription;
+            result.LineDescription = processor.CodeDescription;            
+
+            if (processor.PostProcessors.Any())
+            {                
+                foreach (var postProc  in processor.PostProcessors)
+                {                    
+                    await postProc.PostProcessAsync(result);
+                }
+            }
 
             return result;
         }

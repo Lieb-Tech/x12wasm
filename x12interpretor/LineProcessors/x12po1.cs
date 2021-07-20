@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using x12interpretor.LinePostProcessors;
 using x12interpretor.Models;
 
 namespace x12interpretor.LineProcessors
@@ -13,8 +14,22 @@ namespace x12interpretor.LineProcessors
         {
             CodeDescription = "PO1 - Baseline Item Data";
             LineCode = "PO1";
+            PostProcessors = new List<Ix12linePostProcessor>()
+            {
+                 new x12po1PostProcessor()
+            };
             Fields = new List<x12field>()
             {
+                new x12field()
+                {
+                    Ordinal = 0,
+                    FieldName = "PO1 - Baseline Item Data",
+                    Format = x12fieldFormat.AlphaNumeric,
+                    IsRequired = true,
+                    MaxLen = 3,
+                    MinLen = 2
+                },
+
                 new x12field()
                 {
                     Ordinal = 1,

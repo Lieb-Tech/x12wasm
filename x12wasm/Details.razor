@@ -1,0 +1,30 @@
+﻿<button style="display:@(wasClicked ? "inline" : "none")" @onclick=@mouseMode>Back to mouse over mode</button>
+@((MarkupString)bubbleUp)
+
+@code {   
+
+    public string bubbleUp { get; set; }
+
+    bool wasClicked = false;
+
+    private void mouseMode()
+    {
+        wasClicked = false;
+    }
+
+    public void mouseOvered(string info)
+    {
+        if (!wasClicked)
+        {
+            bubbleUp = info;
+            StateHasChanged();
+        }
+    }
+
+    public void clicked(string info)
+    {
+        wasClicked = true;
+        bubbleUp = info;
+        StateHasChanged();
+    }
+}

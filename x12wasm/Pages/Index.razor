@@ -1,22 +1,34 @@
 ﻿@page "/"
 @using System.IO;
 @using x12interpretor;
-
+@using x12interpretor.Models;
+ 
 <h1>X12 EDI Interpretor</h1>
+<button @onclick=@switchMode>Switch Mode</button> Currently: @(isFocus ? "Focus Mode" : "Default")
 <div class="drag-drop-zone">
-    <InputFile OnChange="fileChange"></InputFile>
+    <InputFile OnChange=@fileChange multiple></InputFile>
     @((MarkupString)fileDragDrop)
 </div>
 
 <div class="flex-container">
-    <div class="flex-item-left" ondrop="event.preventDefault()">
-        @foreach (var line in Results.Lines)
-        {
-        <X12TextLine MouseOvered=@mouseOvered Line=line></X12TextLine>
-        }
-    </div>
+    <div class="flex-item-left" ondrop="event.preventDefault()">       
+        <div class="btn-group" role="group">
+            @foreach (var result in ResultSet)
+            {
+                <button id=@(result.FileName.GetHashCode()) class="btn btn-primary" @onclick="(e) => tabClick(result.FileName, e)">@result.FileName</button>
+            }
+        </div>
+            @if (CurrentSet is not null)
+            {
+                foreach (var line in CurrentSet.Lines)
+                {
+                    <X12TextLine MouseOvered=@mouseOvered Clicked=@clicked Line=line></X12TextLine>
+                }
+            }
+        </div>
     <div class="flex-item-right">
-        @((MarkupString)bubbleUp)
+        <Details @ref=@details> </Details>
+        
     </div>
 </div>
 
@@ -24,33 +36,97 @@
     private string fileDragDrop { get; set; }
     private Interpretor interp = new Interpretor();
 
-    public string bubbleUp { get; set; }
+    x12wasm.LineFormtters.FocusModeLineFormatter focusMode = new x12wasm.LineFormtters.FocusModeLineFormatter();
+    x12wasm.LineFormtters.DefaultLineFormatter defaultMode = new x12wasm.LineFormtters.DefaultLineFormatter();
+
+    public List<x12fileResult> ResultSet { get; set; }
+    public x12fileResult CurrentSet { get; set; }
+
+    private string activeClass { get; set; }
+
+    bool isFocus = false;
+
+    private Details details;
 
     public void mouseOvered(string info)
     {
-        bubbleUp = info;
-        StateHasChanged();
+        details.mouseOvered(info);
+    }
+
+    public void clicked(string info)
+    {
+        details.clicked(info);
+    }
+
+    public void tabClick(string file, MouseEventArgs args)
+    {
+        updateCurrent(ResultSet.First(z => z.FileName == file));
     }
 
     public Index()
     {
-        fileDragDrop = "You can drag/drop the 850 file &nbsp;<em>here</em>, or click to browse for the file.";
+        ResultSet = new List<x12interpretor.Models.x12fileResult>();
+        fileDragDrop = "You can drag/drop multiple 850 files &nbsp;<em>here</em>, or click to browse for the file.";
     }
 
-    public x12interpretor.Models.x12fileResult Results = new x12interpretor.Models.x12fileResult();
+    public void switchMode(MouseEventArgs eventArgs)
+    {
+
+        foreach (var result in ResultSet)
+        {
+            if (!isFocus)
+            {
+                var fm = new x12wasm.LineFormtters.FocusModeLineFormatter();
+                foreach (var line in result.Lines)
+                {
+                    fm.FormatLine(line);
+                }
+            }
+            else
+            {
+                var fm = new x12wasm.LineFormtters.DefaultLineFormatter();
+                foreach (var line in result.Lines)
+                {
+                    fm.FormatLine(line);
+                }
+            }
+        }
+
+        isFocus = !isFocus;
+    }
 
     public async Task fileChange(InputFileChangeEventArgs dea)
     {
-        Results.Lines = new List<x12interpretor.Models.x12lineResult>();
         StateHasChanged();
 
-        var file = dea.File;
-        fileDragDrop = file.Name;
+        var files = dea.GetMultipleFiles(5);
+        if (ResultSet.Any())
+            fileDragDrop = $"{dea.FileCount} files were submitted ; {ResultSet.Count} total files loaded";
+        else
+            fileDragDrop = $"{dea.FileCount} files were submitted";
 
+        foreach (var file in files)
+        {
+            await processFile(file);
+        }
+        CurrentSet = ResultSet[0];
+    }
+
+    private void updateCurrent(x12fileResult result)
+    {
+
+        CurrentSet = result;
+    }
+
+    private async Task processFile(IBrowserFile file)
+    {
         using var rdr = new StreamReader(file.OpenReadStream());
         var info = await rdr.ReadToEndAsync();
 
-        Results = interp.ProcessFile(info);
+        var data = await interp.ProcessFileAsync(info);
+        data.FileName = file.Name;
+
+        ResultSet.Add(data);
 
         StateHasChanged();
     }

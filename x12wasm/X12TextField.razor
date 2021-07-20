@@ -3,12 +3,14 @@
 <div class="fieldValue @(isOver ? "highlight" : "noHighlight")"
      @onmouseover=@onMouseOver
      @onmouseout=@onMouseLeave
+     @onclick=@onClick
      data-toggle="tooltip" data-placement="right">
-    @(TextName)*
+    @((MarkupString)FieldValue)*
 </div>
-@code {    
+@code {
     protected string fieldFormattedInfo { get; set; }
     protected bool isOver { get; set; }
+
 
     // info to show at end of line
     [Parameter]
@@ -17,21 +19,50 @@
     [Parameter]
     public EventCallback<string> MouseOvered { get; set; }
 
+    [Parameter]
+    public EventCallback<string> Clicked { get; set; }
 
     // input fields
     [Parameter]
     public x12interpretor.Models.x12field FieldInfo { get; set; }
 
     [Parameter]
-    public string LineCode { get; set; }
+    public Dictionary<string, string> ExtraValues { get; set; }
+
     [Parameter]
-    public string TextName { get; set; }
+    public string LineCode { get; set; }
+
+    [Parameter]
+    public string FieldValue { get; set; }
+
+    public async Task onClick(MouseEventArgs args)
+    {
+        await ensureFormattedInfo();
+        await Clicked.InvokeAsync(fieldFormattedInfo);
+    }
 
 
     public async Task onMouseOver()
     {
         isOver = true;
+        await ensureFormattedInfo();
 
+        await MouseOvered.InvokeAsync(fieldFormattedInfo);
+    }
+    /*        if (LineCode == "N1" && FieldInfo.Ordinal == 4)
+            {
+                var val = FieldValue;
+                var idx = val.IndexOf(">");
+                if (idx > 0)
+                    val = val.Substring(idx, val.IndexOf("<", idx) - idx);
+
+                var sql = $"SELECT * FROM Split..sbLocationsAccts WHERE ShipToAcct = {val}";
+
+                await JSRuntime.InvokeVoidAsync("clipboardCopy.copyText", val);
+            }
+    */
+    private async Task ensureFormattedInfo()
+    {
         // if already string formtted
         if (!string.IsNullOrWhiteSpace(fieldFormattedInfo))
         {
@@ -39,31 +70,24 @@
             return;
         }
 
-        if (FieldInfo is null || string.IsNullOrWhiteSpace(TextName))
+        if (FieldInfo is null || string.IsNullOrWhiteSpace(FieldValue))
         {
             // if not the initial LineCode
             fieldFormattedInfo = generateLineCode();
-        }
-        else if (LineCode == "PO1" && TextName.Length >= 10 && (FieldInfo.Ordinal == 9 || FieldInfo.Ordinal == 7))
-        {
-            // if one of the NDC fields
-            await doNDC();
         }
         else
         {
             doNonNDC();
         }
-
-        await MouseOvered.InvokeAsync(fieldFormattedInfo);
-
     }
+
     private string generateNDCInfo(string mapped, string ndc)
     {
         string result = $@"<table>
 <tr><td>Line:</td><td>{LineCode}</td></tr>
 <tr><td>Field:</td><td>{FieldInfo.FieldName}</td></tr>
 <tr><td colspan=2></br></td></tr>
-<tr><td>Value:</td><td>{TextName}</td></tr>";
+<tr><td>Value:</td><td>{FieldValue}</td></tr>";
 
         if (!string.IsNullOrWhiteSpace(mapped))
             result = $"{result}<tr><td colspan=2></br></td></tr><tr><td>NDC</br>Info:</td><td>{mapped}</td></tr>";
@@ -76,6 +100,7 @@
 
     private string generateFieldInfo(string mapped)
     {
+
         string result = $@"<table>
 <tr><td>Line:</td><td>{LineCode}</td></tr>
 <tr><td>Field:</td><td>{FieldInfo.FieldName}</td></tr>
@@ -84,7 +109,17 @@
 <tr><td>Max Len:</td><td>{FieldInfo.MaxLen}</td></tr>
 <tr><td>Required:</td><td>{FieldInfo.IsRequired}</td></tr>
 <tr><td colspan=2></br></td></tr>
-<tr><td>Value:</td><td>{TextName}</td></tr>";
+<tr><td>Value:</td><td style='color:black !important'>{FieldValue}</td></tr>";
+
+        if (ExtraValues is not null)
+        {
+            result = $"{result}<tr><td colspan=2></br></td></tr>";
+            foreach (var pp in ExtraValues)
+            {
+                result = $"{result}<tr><td>{pp.Key}</td><td>{pp.Value}</td></tr>";
+            }
+            result = $"{result}<tr><td colspan=2></br></td></tr>";
+        }
 
         if (!string.IsNullOrWhiteSpace(mapped))
             return $"{result}<tr><td colspan=2></br></td></tr><tr><td>Value Code:</td><td>{mapped}</td></tr>";
@@ -94,55 +129,16 @@
 
     private string generateLineCode()
     {
-        return $@"<table><tr><td>Line:</td><td>{TextName}</td></tr></table>";
-    }
-
-    private async Task doNDC()
-    {
-        // build 10 digit NDC
-        var ndc = string.Empty;
-        var data = string.Empty;
-
-        if (TextName[0] == '0')
-            // 1234 5678 90 (skip 0)
-            ndc = $"{TextName.Substring(1, 4)}-{TextName.Substring(5, 4)}-{TextName.Substring(9, 2)}";
-        else
-            // 01234 678 90 (skip 5)
-            ndc = $"{TextName.Substring(0, 5)}-{TextName.Substring(6, 3)}-{TextName.Substring(9, 2)}";
-
-        // get the data
-        string key = "6YCE9aEudJjl1q1AbrzD7nPZ1TVCcZ0Mvw6esACj";
-        var cli = new HttpClient();
-        var url = $"https://api.fda.gov/drug/ndc.json?api_key={key}&search=packaging.package_ndc:\"{ndc}\"&limit=1";
-
-        try
-        {
-            var json = await cli.GetStringAsync(url);
-
-            if (!json.Contains("NOT_FOUND"))
-            {
-                Root myDeserializedClass = System.Text.Json.JsonSerializer.Deserialize<Root>(json);
-                data = $"{myDeserializedClass.results[0].brand_name} - {myDeserializedClass.results[0].active_ingredients[0].name} {myDeserializedClass.results[0].active_ingredients[0].strength}";
-            }
-            else
-                data = $"{ndc} not found";
-        }
-        catch
-        {
-            data = $"{ndc} not found";
-        }
-
-        await LineInfo.InvokeAsync(data);
-        fieldFormattedInfo = generateNDCInfo(data,ndc);
+        return $@"<table><tr><td>Line:</td><td>{FieldValue}</td></tr></table>";
     }
 
     private void doNonNDC()
     {
-        if (string.IsNullOrWhiteSpace(TextName) || FieldInfo.ValueMap is null)
+        if (string.IsNullOrWhiteSpace(FieldValue) || FieldInfo.ValueMap is null)
             fieldFormattedInfo = generateFieldInfo(null);
 
-        else if (FieldInfo.ValueMap.ContainsKey(TextName.Trim()))
-            fieldFormattedInfo = generateFieldInfo(FieldInfo.ValueMap[TextName.Trim()]);
+        else if (FieldInfo.ValueMap.ContainsKey(FieldValue.Trim()))
+            fieldFormattedInfo = generateFieldInfo(FieldInfo.ValueMap[FieldValue.Trim()]);
 
         else
             fieldFormattedInfo = generateFieldInfo(null);
