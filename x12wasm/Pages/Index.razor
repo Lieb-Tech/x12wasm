@@ -1,8 +1,11 @@
 ﻿@page "/"
+@inject IJSRuntime JSRuntime
+
 @using System.IO;
 @using x12interpretor;
 @using x12interpretor.Models;
- 
+
+
 <h1>X12 EDI Interpretor</h1>
 <button @onclick=@switchMode>Switch Mode</button> Currently: @(isFocus ? "Focus Mode" : "Default")
 <div class="drag-drop-zone">
@@ -11,24 +14,26 @@
 </div>
 
 <div class="flex-container">
-    <div class="flex-item-left" ondrop="event.preventDefault()">       
+    <div class="flex-item-left" ondrop="event.preventDefault()">
         <div class="btn-group" role="group">
             @foreach (var result in ResultSet)
             {
-                <button id=@(result.FileName.GetHashCode()) class="btn btn-primary" @onclick="(e) => tabClick(result.FileName, e)">@result.FileName</button>
+            <button id=@(result.FileName.GetHashCode()) class="btn btn-active" @onclick="(e) => tabClick(result.FileName, e)">@result.FileName</button>
             }
         </div>
-            @if (CurrentSet is not null)
+        <br />
+        <br />
+        @if (CurrentSet is not null)
+        {
+            foreach (var line in CurrentSet.Lines)
             {
-                foreach (var line in CurrentSet.Lines)
-                {
-                    <X12TextLine MouseOvered=@mouseOvered Clicked=@clicked Line=line></X12TextLine>
-                }
+        <X12TextLine MouseOvered=@mouseOvered Clicked=@clicked Line=line></X12TextLine>
             }
-        </div>
+        }
+    </div>
     <div class="flex-item-right">
         <Details @ref=@details> </Details>
-        
+
     </div>
 </div>
 
@@ -58,9 +63,9 @@
         details.clicked(info);
     }
 
-    public void tabClick(string file, MouseEventArgs args)
+    public async Task tabClick(string file, MouseEventArgs args)
     {
-        updateCurrent(ResultSet.First(z => z.FileName == file));
+        await updateCurrent(ResultSet.First(z => z.FileName == file));
     }
 
     public Index()
@@ -109,12 +114,12 @@
         {
             await processFile(file);
         }
-        CurrentSet = ResultSet[0];
+        await updateCurrent(ResultSet[0]);
     }
 
-    private void updateCurrent(x12fileResult result)
+    private async Task updateCurrent(x12fileResult result)
     {
-
+        await JSRuntime.InvokeVoidAsync("activeButton.setActive", "#" + result.FileName.GetHashCode());
         CurrentSet = result;
     }
 

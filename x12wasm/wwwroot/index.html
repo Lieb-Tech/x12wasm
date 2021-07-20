@@ -13,6 +13,13 @@
     <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
 
     <script>
+        window.activeButton = {
+            setActive: function (qry) {
+                $(".btn-primary").removeClass("btn-primary");
+                $(qry).addClass("btn-primary");
+            }
+        };
+
         window.clipboardCopy = {
             copyText: function (codeElement) {
                 navigator.clipboard.writeText(codeElement)
