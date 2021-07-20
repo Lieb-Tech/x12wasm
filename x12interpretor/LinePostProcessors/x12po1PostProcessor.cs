@@ -16,9 +16,14 @@ namespace x12interpretor.LinePostProcessors
         {
             lineResult = result;
 
-            // find the N4, next will be NDC (VN or VC is ProductID)
-            var codeOrdinal = result.FieldResults.FirstOrDefault(z => z.FileValue == "N4").Field.Ordinal;            
-            var val = result.FieldResults.FirstOrDefault(z => z.Field.Ordinal == codeOrdinal + 1);
+            // find the N4, next will be NDC
+            var codeOrdinal = result.FieldResults.FirstOrDefault(z => z.FileValue == "N4")?.Field.Ordinal;
+
+            // if not in file
+            if (codeOrdinal is null)
+                return;
+
+            var val = result.FieldResults.FirstOrDefault(z => z.Field.Ordinal == codeOrdinal.Value + 1);
             await processFieldAsync(val);
         }
 

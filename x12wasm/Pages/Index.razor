@@ -7,7 +7,7 @@
 
 
 <h1>X12 EDI Interpretor</h1>
-<button @onclick=@switchMode>Switch Mode</button> Currently: @(isFocus ? "Focus Mode" : "Default")
+<button @onclick=@switchMode>Switch Mode</button> Currently: @(inFocusMode ? "Focus Mode" : "Default")
 <div class="drag-drop-zone">
     <InputFile OnChange=@fileChange multiple></InputFile>
     @((MarkupString)fileDragDrop)
@@ -15,6 +15,7 @@
 
 <div class="flex-container">
     <div class="flex-item-left" ondrop="event.preventDefault()">
+        @* will I need a horizontal scroll bar? *@
         <div class="btn-group" role="group">
             @foreach (var result in ResultSet)
             {
@@ -44,29 +45,17 @@
     x12wasm.LineFormtters.FocusModeLineFormatter focusMode = new x12wasm.LineFormtters.FocusModeLineFormatter();
     x12wasm.LineFormtters.DefaultLineFormatter defaultMode = new x12wasm.LineFormtters.DefaultLineFormatter();
 
+    // all the files loaded
     public List<x12fileResult> ResultSet { get; set; }
+    // currently displayed tab
     public x12fileResult CurrentSet { get; set; }
 
-    private string activeClass { get; set; }
 
-    bool isFocus = false;
+    // is FocusMode the active mode
+    bool inFocusMode = false;
 
+    // details.razor -- used as @ref to send info from mouse events
     private Details details;
-
-    public void mouseOvered(string info)
-    {
-        details.mouseOvered(info);
-    }
-
-    public void clicked(string info)
-    {
-        details.clicked(info);
-    }
-
-    public async Task tabClick(string file, MouseEventArgs args)
-    {
-        await updateCurrent(ResultSet.First(z => z.FileName == file));
-    }
 
     public Index()
     {
@@ -74,65 +63,91 @@
         fileDragDrop = "You can drag/drop multiple 850 files &nbsp;<em>here</em>, or click to browse for the file.";
     }
 
-    public void switchMode(MouseEventArgs eventArgs)
+    // send mouse events to Details
+    public void mouseOvered(string info)
     {
-
-        foreach (var result in ResultSet)
-        {
-            if (!isFocus)
-            {
-                var fm = new x12wasm.LineFormtters.FocusModeLineFormatter();
-                foreach (var line in result.Lines)
-                {
-                    fm.FormatLine(line);
-                }
-            }
-            else
-            {
-                var fm = new x12wasm.LineFormtters.DefaultLineFormatter();
-                foreach (var line in result.Lines)
-                {
-                    fm.FormatLine(line);
-                }
-            }
-        }
-
-        isFocus = !isFocus;
+        details.mouseOvered(info);
+    }
+    // send mouse events to Details
+    public void clicked(string info)
+    {
+        details.clicked(info);
     }
 
+    // file name clicked
+    public async Task tabClick(string file, MouseEventArgs args)
+    {
+        await updateCurrent(ResultSet.First(z => z.FileName == file));
+    }
+
+    // change the UI mode for all loaded files
+    public void switchMode(MouseEventArgs eventArgs)
+    {
+        foreach (var result in ResultSet)
+        {
+            setModeOnResult(result);
+        }
+        inFocusMode = !inFocusMode;
+    }
+
+    // change a result UI mode
+    private void setModeOnResult(x12fileResult result)
+    {
+        // later on - make this more dynamic
+        if (!inFocusMode)
+        {
+            var fm = new x12wasm.LineFormtters.FocusModeLineFormatter();
+            foreach (var line in result.Lines)
+            {
+                fm.FormatLine(line);
+            }
+        }
+        else
+        {
+            var fm = new x12wasm.LineFormtters.DefaultLineFormatter();
+            foreach (var line in result.Lines)
+            {
+                fm.FormatLine(line);
+            }
+        }
+    }
+
+    // files dropped or browsed for - process 
     public async Task fileChange(InputFileChangeEventArgs dea)
     {
-        StateHasChanged();
-
         var files = dea.GetMultipleFiles(5);
-        if (ResultSet.Any())
-            fileDragDrop = $"{dea.FileCount} files were submitted ; {ResultSet.Count} total files loaded";
-        else
-            fileDragDrop = $"{dea.FileCount} files were submitted";
-
         foreach (var file in files)
         {
             await processFile(file);
         }
+
+        // make first file loaded the active
         await updateCurrent(ResultSet[0]);
+                
+        StateHasChanged();
     }
 
     private async Task updateCurrent(x12fileResult result)
     {
+        // update the css classes for the buttons
         await JSRuntime.InvokeVoidAsync("activeButton.setActive", "#" + result.FileName.GetHashCode());
         CurrentSet = result;
     }
 
+    // process 1 file
     private async Task processFile(IBrowserFile file)
     {
+        // load the data
         using var rdr = new StreamReader(file.OpenReadStream());
         var info = await rdr.ReadToEndAsync();
 
+        // process the data
         var data = await interp.ProcessFileAsync(info);
         data.FileName = file.Name;
 
+        // update display field to match current selected mode
+        setModeOnResult(data);
+        // save to list
         ResultSet.Add(data);
-
-        StateHasChanged();
     }
 }
