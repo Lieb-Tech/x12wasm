@@ -25,6 +25,8 @@ namespace x12wasm.FieldFormatters
 
             if (!_ordinalsToSkip.Contains(fieldResult.Field.Ordinal))
                 fieldResult.DisplayValue = $"<span style='color:{_newColor};'>{fieldResult.FileValue}</span>";
+            else
+                fieldResult.DisplayValue = fieldResult.FileValue;
         }
     }
 }

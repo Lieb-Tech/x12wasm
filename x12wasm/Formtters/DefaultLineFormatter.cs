@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using x12interpretor.Models;
+﻿using x12interpretor.Models;
 
-namespace x12wasm.LineFormtters
+namespace x12wasm.Formtters
 {
-    public class DefaultLineFormatter
+    public class DefaultLineFormatter: IFormatter, ILineFormatter
     {
         public void FormatLine(x12lineResult result)
         {

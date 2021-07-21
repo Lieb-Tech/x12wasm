@@ -4,12 +4,13 @@
 @using System.IO;
 @using x12interpretor;
 @using x12interpretor.Models;
-
+@using x12wasm.Formtters; 
 
 <h1>X12 EDI Interpretor</h1>
 Mode: <select @onchange=@selectMode>
     <option value="Default">Default</option>
     <option value="Focus850">850 Focus</option>
+    <option value="PO1">PO1 Highlighter</option>
 </select>
 <div class="drag-drop-zone">
     <InputFile OnChange=@fileChange multiple></InputFile>
@@ -45,17 +46,14 @@ Mode: <select @onchange=@selectMode>
     private string fileDragDrop { get; set; }
     private Interpretor interp = new Interpretor();
 
-    x12wasm.LineFormtters.FocusModeLineFormatter focusMode = new x12wasm.LineFormtters.FocusModeLineFormatter();
-    x12wasm.LineFormtters.DefaultLineFormatter defaultMode = new x12wasm.LineFormtters.DefaultLineFormatter();
+    // default mode
+    private IFormatter currentFormatter = new DefaultLineFormatter();
 
     // all the files loaded
     public List<x12fileResult> ResultSet { get; set; }
+
     // currently displayed tab
     public x12fileResult CurrentSet { get; set; }
-
-
-    // is FocusMode the active mode
-    bool inFocusMode = false;
 
     // details.razor -- used as @ref to send info from mouse events
     private Details details;
@@ -86,7 +84,12 @@ Mode: <select @onchange=@selectMode>
     // change the UI mode for all loaded files
     void selectMode(ChangeEventArgs e)
     {
-        inFocusMode = (e.Value.ToString() == "Focus850");
+        currentFormatter = e.Value.ToString() switch
+        {
+            "PO1" => new SectionFormatter("PO1", "PO1"),
+            "Focus850" => new FocusModeLineFormatter(),
+            _ => new DefaultLineFormatter()
+        };
 
         foreach (var result in ResultSet)
         {
@@ -98,21 +101,16 @@ Mode: <select @onchange=@selectMode>
     private void setModeOnResult(x12fileResult result)
     {
         // later on - make this more dynamic
-        if (inFocusMode)
+        if (currentFormatter is ILineFormatter)
         {
-            var fm = new x12wasm.LineFormtters.FocusModeLineFormatter();
             foreach (var line in result.Lines)
             {
-                fm.FormatLine(line);
+                ((ILineFormatter)currentFormatter).FormatLine(line);
             }
         }
         else
         {
-            var fm = new x12wasm.LineFormtters.DefaultLineFormatter();
-            foreach (var line in result.Lines)
-            {
-                fm.FormatLine(line);
-            }
+            ((IFileFormatter)currentFormatter).FormatFile(result);
         }
     }
 

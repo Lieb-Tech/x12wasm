@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace x12interpreter.Models
+namespace x12interpretor.Models
 {
     public class Result
     {

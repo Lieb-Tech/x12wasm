@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using x12interpretor.Models;
 using x12wasm.FieldFormatters;
 
-namespace x12wasm.LineFormtters
+namespace x12wasm.Formtters
 {
-    public class FocusModeLineFormatter 
+    public class FocusModeLineFormatter : IFormatter, ILineFormatter
     {
         const string newColor = "silver";
         public string LineCode { get; set; }

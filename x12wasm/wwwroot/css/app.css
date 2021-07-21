@@ -142,3 +142,13 @@ a, .btn-link {
     height:375px;
     overflow-y:scroll;
 }
+
+.section1 {
+    background-color:white;
+    color:blue;
+}
+
+.section2 {
+    background-color: white;
+    color: red;
+}
