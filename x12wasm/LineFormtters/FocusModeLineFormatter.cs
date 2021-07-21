@@ -9,21 +9,22 @@ namespace x12wasm.LineFormtters
 {
     public class FocusModeLineFormatter 
     {
+        const string newColor = "silver";
         public string LineCode { get; set; }
         public List<IFieldFormatter> Formatters { get; set; }
 
         public FocusModeLineFormatter()
         {
             Formatters = new List<IFieldFormatter>();
-            Formatters.Add(new MakeItLightBlue("PO1", new int[] { 2, 7, 9 }));
-            Formatters.Add(new MakeItLightBlue("ISA", null));
-            Formatters.Add(new MakeItLightBlue("GS", null));
-            Formatters.Add(new MakeItLightBlue("ST", null));
-            Formatters.Add(new MakeItLightBlue("REF", null));
-            Formatters.Add(new MakeItLightBlue("CTT", null));
+            Formatters.Add(new ChangeColor("PO1", new int[] { 2, 7, 9 }, newColor));
+            Formatters.Add(new ChangeColor("ISA", null, newColor));
+            Formatters.Add(new ChangeColor("GS", null, newColor));
+            Formatters.Add(new ChangeColor("ST", null, newColor));
+            Formatters.Add(new ChangeColor("REF", null, newColor));
+            Formatters.Add(new ChangeColor("CTT", null, newColor));
 
-            Formatters.Add(new MakeItLightBlue("N1", new int[1] { 4 }));
-            Formatters.Add(new MakeItLightBlue("BEG", new int[1] { 3 }));
+            Formatters.Add(new ChangeColor("N1", new int[1] { 4 }, newColor));
+            Formatters.Add(new ChangeColor("BEG", new int[1] { 3 }, newColor));
         }
         public void FormatLine(x12lineResult result)
         {

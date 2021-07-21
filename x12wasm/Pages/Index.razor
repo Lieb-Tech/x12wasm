@@ -128,7 +128,7 @@ Mode: <select @onchange=@selectMode>
     {
         var files = dea.GetMultipleFiles(5);
 
-        fileDragDrop = $"Processing {files.Count}";
+        fileDragDrop = $"Processing {files.Count} file(s)";
 
         foreach (var file in files)
         {
@@ -137,11 +137,13 @@ Mode: <select @onchange=@selectMode>
 
         StateHasChanged();
 
-        // make first file loaded the active
-        await updateCurrent(ResultSet[0]);
-        StateHasChanged();
         fileDragDrop = "You can drag/drop multiple 850 files &nbsp;<em>here</em>, or click to browse for the file.";
         StateHasChanged();
+
+        // make first file loaded the active
+        await updateCurrent(ResultSet.Last());
+        StateHasChanged();
+
     }
 
     // process 1 file

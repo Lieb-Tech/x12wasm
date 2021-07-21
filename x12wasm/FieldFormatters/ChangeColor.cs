@@ -6,13 +6,15 @@ using x12interpretor.Models;
 
 namespace x12wasm.FieldFormatters
 {
-    public class MakeItLightBlue : IFieldFormatter
+    public class ChangeColor : IFieldFormatter
     {
         private readonly int[] _ordinalsToSkip;
         private readonly string _code;
+        private readonly string _newColor;
 
-        public MakeItLightBlue(string lineCode, int[] ordinalsToSkip)
+        public ChangeColor(string lineCode, int[] ordinalsToSkip, string newColor)
         {
+            _newColor = newColor;
             _code = lineCode;
             _ordinalsToSkip = ordinalsToSkip ?? new int[0];
         }
@@ -22,7 +24,7 @@ namespace x12wasm.FieldFormatters
                 return;
 
             if (!_ordinalsToSkip.Contains(fieldResult.Field.Ordinal))
-                fieldResult.DisplayValue = $"<span style='color:lightBlue;'>{fieldResult.FileValue}</span>";
+                fieldResult.DisplayValue = $"<span style='color:{_newColor};'>{fieldResult.FileValue}</span>";
         }
     }
 }
