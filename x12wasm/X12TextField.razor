@@ -101,7 +101,7 @@
         if (FieldResult.Field.ValueMap is not null && FieldResult.Field.ValueMap.Any())
         {
             result.Append("<tr><td colspan=2></br></td></tr><tr><td colspan=2><div class='valueMapTable'><table>");
-            foreach (var pp in FieldResult.Field.ValueMap)
+            foreach (var pp in FieldResult.Field.ValueMap.OrderBy(z => z.Key))
             {
                 if (FieldResult.FileValue == pp.Key)
                     result.Append($"<tr><td class='detailCode matched'>{pp.Key}</td><td class='matched'>{pp.Value}</td></tr>");

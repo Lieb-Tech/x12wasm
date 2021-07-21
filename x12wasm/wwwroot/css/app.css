@@ -130,12 +130,12 @@ a, .btn-link {
         cursor: pointer;
     }
 
-.mached {
+.matched {
     color: red;
 }
 
 .detailCode {
-    width: 75px;
+    width: 50px;
 }
 
 .valueMapTable {
