@@ -1,5 +1,6 @@
 ﻿
 using System.Collections.Generic;
+using x12interpretor.LinePostProcessors;
 using x12interpretor.Models;
 
 namespace x12interpretor.LineProcessors
@@ -8,6 +9,10 @@ namespace x12interpretor.LineProcessors
     {
         public x12beg() : base("BEG")
         {
+            PostProcessors = new List<Ix12linePostProcessor>()
+            {
+                 new x12bePostProcessor()
+            };
             CodeDescription = "BEG - Transactioal beginning Segment for Purchase Order";
             LineCode = "BEG";
             Fields = new List<x12field>()

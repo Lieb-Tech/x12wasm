@@ -6,9 +6,7 @@
         @foreach (var field in Line.FieldResults)
         {
             <X12TextField 
-                          FieldInfo=@field.Field
-                          FieldValue=@field.DisplayValue
-                          ExtraValues=@field.ExtraValues
+                          FieldResult=@field
                           LineCode=@Line.LineCode                          
 
                           Clicked=@clicked

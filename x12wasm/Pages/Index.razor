@@ -7,19 +7,22 @@
 
 
 <h1>X12 EDI Interpretor</h1>
-<button @onclick=@switchMode>Switch Mode</button> Currently: @(inFocusMode ? "Focus Mode" : "Default")
+Mode: <select @onchange=@selectMode>
+    <option value="Default">Default</option>
+    <option value="Focus850">850 Focus</option>
+</select>
 <div class="drag-drop-zone">
     <InputFile OnChange=@fileChange multiple></InputFile>
     @((MarkupString)fileDragDrop)
 </div>
 
-<div class="flex-container">
+<div class="flex-container" @ondrop:preventDefault="true">
     <div class="flex-item-left" ondrop="event.preventDefault()">
         @* will I need a horizontal scroll bar? *@
         <div class="btn-group" role="group">
             @foreach (var result in ResultSet)
             {
-            <button id=@(result.FileName.GetHashCode()) class="btn btn-active" @onclick="(e) => tabClick(result.FileName, e)">@result.FileName</button>
+                <button id=@(result.FileName.GetHashCode()) class="btn btn-active" @onclick="(e) => tabClick(result.FileName, e)">@result.FileName</button>
             }
         </div>
         <br />
@@ -28,7 +31,7 @@
         {
             foreach (var line in CurrentSet.Lines)
             {
-        <X12TextLine MouseOvered=@mouseOvered Clicked=@clicked Line=line></X12TextLine>
+                <X12TextLine MouseOvered=@mouseOvered Clicked=@clicked Line=line></X12TextLine>
             }
         }
     </div>
@@ -81,9 +84,9 @@
     }
 
     // change the UI mode for all loaded files
-    public void switchMode(MouseEventArgs eventArgs)
+    void selectMode(ChangeEventArgs e)
     {
-        inFocusMode = !inFocusMode;
+        inFocusMode = (e.Value.ToString() == "Focus850");
 
         foreach (var result in ResultSet)
         {
@@ -113,7 +116,14 @@
         }
     }
 
-    // files dropped or browsed for - process 
+    private async Task updateCurrent(x12fileResult result)
+    {
+        // update the css classes for the buttons
+        await JSRuntime.InvokeVoidAsync("activeButton.setActive", "#" + result.FileName.GetHashCode());
+        CurrentSet = result;
+    }
+
+    // files dropped or browsed for - process
     public async Task fileChange(InputFileChangeEventArgs dea)
     {
         var files = dea.GetMultipleFiles(5);
@@ -132,13 +142,6 @@
         StateHasChanged();
         fileDragDrop = "You can drag/drop multiple 850 files &nbsp;<em>here</em>, or click to browse for the file.";
         StateHasChanged();
-    }
-
-    private async Task updateCurrent(x12fileResult result)
-    {
-        // update the css classes for the buttons
-        await JSRuntime.InvokeVoidAsync("activeButton.setActive", "#" + result.FileName.GetHashCode());
-        CurrentSet = result;
     }
 
     // process 1 file
