@@ -8,6 +8,7 @@ namespace x12interpretor.Models
 {
     public class x12field
     {
+        public string FieldCode { get; set; }
         public int Ordinal { get; set; }
         public string FieldName { get; set; }
         public bool IsRequired { get; set; }

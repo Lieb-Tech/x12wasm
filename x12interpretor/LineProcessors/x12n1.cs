@@ -27,6 +27,7 @@ namespace x12interpretor.LineProcessors
 
                 new x12field()
                 {
+                    FieldCode = "N101",
                     Ordinal = 1,
                     FieldName = "Entity Identifier Code",
                     Format = x12fieldFormat.AlphaNumeric,
@@ -35,14 +36,25 @@ namespace x12interpretor.LineProcessors
                     MinLen = 2,
                     ValueMap = new Dictionary<string, string>()
                     {
-                        {  "BY", "Buying Party (Purchaser)" },
-                        {  "PO", "Party to Receive Invoice for Goods or Services" },
+                        { "SF", "Ship From" },
+                        { "BY", "Buying Party (Purchaser)" },
+                        { "PO", "Party to Receive Invoice for Goods or Services" },
                         { "BT", "Bill-to-Party" },
-                        { "RU", "Resale Dealer" }
+                        { "RU", "Resale Dealer" },
+                        { "ST", "Ship To" },
+                        { "RI", "Remit To" },
+                        { "CA", "Carrier" },
+                        { "DU", "Reseller" },
+                        { "EN", "End User" },
+                        { "II", "Issuer of Invoice" },
+                        { "PR", "Payer" },
+                        { "SE", "Selling Party" },
+                        { "SO", "Sold To If Different From Bill To" },
                     }
                 },
                 new x12field()
                 {
+                    FieldCode = "N102",
                     Ordinal = 2,
                     FieldName = "Name",
                     Format = x12fieldFormat.AlphaNumeric,
@@ -52,6 +64,7 @@ namespace x12interpretor.LineProcessors
                 },
                 new x12field()
                 {
+                    FieldCode = "N103",
                     Ordinal = 3,
                     FieldName = "Identification Code Qualifier",
                     Format = x12fieldFormat.Numeric,
@@ -66,6 +79,7 @@ namespace x12interpretor.LineProcessors
                 },
                 new x12field()
                 {
+                    FieldCode = "N104",
                     Ordinal = 4,
                     FieldName = "Identification Code Qualifier",
                     Format = x12fieldFormat.AlphaNumeric,

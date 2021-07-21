@@ -53,6 +53,8 @@ a, .btn-link {
     box-sizing: border-box;
 }
 
+/**********************************************************************/
+
 .flex-container {
     display: flex;
     flex-direction: row;    
@@ -64,14 +66,14 @@ a, .btn-link {
     padding: 10px;
     flex: 1;
     overflow-y: auto;
-    height: 600px;
+    height: 700px;
 }
 
 .flex-item-right {
     background-color: #f1f1f1;
     padding: 10px;
-    flex: 0 0 400px;    
-    height: 600px;
+    flex: 0 0 500px;
+    height: 700px;
 }
 
 /* Responsive layout - makes a one column-layout instead of two-column layout */
@@ -128,10 +130,15 @@ a, .btn-link {
         cursor: pointer;
     }
 
-.tabset {
-    display: inline-block;
-    border: solid 1px black;
-    height: 50px;
-    width: 200px;
-    text-align:center;
+.mached {
+    color: red;
+}
+
+.detailCode {
+    width: 75px;
+}
+
+.valueMapTable {
+    height:375px;
+    overflow-y:scroll;
 }

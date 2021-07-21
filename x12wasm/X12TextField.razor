@@ -83,7 +83,7 @@
 <tr><td>Max Len:</td><td>{FieldResult.Field.MaxLen}</td></tr>
 <tr><td>Required:</td><td>{FieldResult.Field.IsRequired}</td></tr>
 <tr><td colspan=2></br></td></tr>
-<tr><td>Value:</td><td style='color:black !important'>{FieldResult.FileValue ?? ""}</td></tr>");
+<tr><td>Value:</td><td >{FieldResult.FileValue ?? ""}</td></tr>");
 
         if (FieldResult.ExtraValues is not null)
         {
@@ -96,16 +96,19 @@
         }
 
         if (!string.IsNullOrWhiteSpace(mapped))
-            return $"{result}<tr><td colspan=2></br></td></tr><tr><td>Value Code:</td><td>{mapped}</td></tr>";
+            result.Append($"<tr><td colspan=2></br></td></tr><tr><td>Value Code:</td><td>{mapped}</td></tr>");
 
         if (FieldResult.Field.ValueMap is not null && FieldResult.Field.ValueMap.Any())
         {
-            result.Append("<tr><td colspan=2></br></td></tr>");
+            result.Append("<tr><td colspan=2></br></td></tr><tr><td colspan=2><div class='valueMapTable'><table>");
             foreach (var pp in FieldResult.Field.ValueMap)
             {
-                result.Append($"<tr><td>{pp.Key}</td><td>{pp.Value}</td></tr>");
+                if (FieldResult.FileValue == pp.Key)
+                    result.Append($"<tr><td class='detailCode matched'>{pp.Key}</td><td class='matched'>{pp.Value}</td></tr>");
+                else
+                    result.Append($"<tr><td class='detailCode'>{pp.Key}</td><td>{pp.Value}</td></tr>");
             }
-            result.Append("<tr><td colspan=2></br></td></tr>");
+            result.Append("</table></div></td></tr><tr><td colspan=2></br></td></tr>");
         }
 
         return $"{result}</table>";

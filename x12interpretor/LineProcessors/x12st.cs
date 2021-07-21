@@ -23,15 +23,21 @@ namespace x12interpretor.LineProcessors
 
                 new x12field()
                 {
+                    FieldCode = "ST01",
                     Ordinal = 1,
                     FieldName = "Trasactional Set Identifier Code",
                     Format = x12fieldFormat.Numeric,
                     IsRequired = true,
                     MaxLen = 2,
-                    MinLen = 3
+                    MinLen = 3,
+                    ValueMap = new Dictionary<string, string>()
+                    {
+                        { "850", "Purchase Order"}
+                    }
                 },
                 new x12field()
                 {
+                    FieldCode = "ST02",
                     Ordinal = 2,
                     FieldName = "Trasactional Set Control Number",
                     Format = x12fieldFormat.Numeric,

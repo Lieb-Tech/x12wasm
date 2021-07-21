@@ -58,7 +58,8 @@ namespace x12interpretor.LineProcessors
                     MinLen = 1,
                     ValueMap = new Dictionary<string, string>()
                     {
-                        { "EA", "Each" }
+                        { "EA", "Each" },
+                        { "CA", "Case" }
                     }
                 },
                 new x12field()
@@ -96,7 +97,8 @@ namespace x12interpretor.LineProcessors
                     {
                         { "BP", "Buyer's Part Number" },
                         { "VC", "Vendor's (Seller's) Catalog Number"},
-                        { "VN", "Vendor’s Item Number" }
+                        { "VN", "Vendor’s Item Number" },
+                        { "UP", "U.P.C. Consumer Package Code (1-5-5-1)"}
                     }
                 },
                 new x12field()
@@ -120,7 +122,8 @@ namespace x12interpretor.LineProcessors
                     {
                         { "BP", "Buyer's Part Number" },
                         { "VC", "Vendor's (Seller's) Catalog Number"},
-                        { "VN", "Vendor’s Item Number" }
+                        { "VN", "Vendor’s Item Number" },
+                        { "UP", "U.P.C. Consumer Package Code (1-5-5-1)"}
                     }
                 },
                 new x12field()

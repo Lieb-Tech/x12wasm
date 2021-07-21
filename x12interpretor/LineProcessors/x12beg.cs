@@ -18,7 +18,7 @@ namespace x12interpretor.LineProcessors
             Fields = new List<x12field>()
             {
                 new x12field()
-                {
+                {                    
                     Ordinal = 0,
                     FieldName = "BEG - Transactioal beginning Segment for Purchase Order",
                     Format = x12fieldFormat.AlphaNumeric,
@@ -29,6 +29,7 @@ namespace x12interpretor.LineProcessors
 
                 new x12field()
                 {
+                    FieldCode = "BEG01",
                     Ordinal = 1,
                     FieldName = "Transaction Set Purpose Code",
                     Format = x12fieldFormat.Numeric,
@@ -42,6 +43,7 @@ namespace x12interpretor.LineProcessors
                 },
                 new x12field()
                 {
+                    FieldCode = "BEG02",
                     Ordinal = 2,
                     FieldName = "Purchase Order Type Code",
                     Format = x12fieldFormat.Numeric,
@@ -50,11 +52,13 @@ namespace x12interpretor.LineProcessors
                     MinLen = 2,
                     ValueMap = new Dictionary<string, string>()
                     {
-                        { "NE", "New Order" }      
+                        { "NE", "New Order" },
+                        { "SA", "Stand-alone Order" }
                     }
                 },
                 new x12field()
                 {
+                    FieldCode = "BEG03",
                     Ordinal = 3,
                     FieldName = "Purchase Order Number",
                     Format = x12fieldFormat.AlphaNumeric,
@@ -64,6 +68,7 @@ namespace x12interpretor.LineProcessors
                 },
                 new x12field()
                 {
+                    FieldCode = "BEG04",
                     Ordinal = 4,
                     FieldName = "Release Number",
                     Format = x12fieldFormat.Numeric,
@@ -73,6 +78,7 @@ namespace x12interpretor.LineProcessors
                 },
                 new x12field()
                 {
+                    FieldCode = "BEG05",
                     Ordinal = 5,
                     FieldName = "Date - CCYYMMDD",
                     Format = x12fieldFormat.Date8,
@@ -82,6 +88,7 @@ namespace x12interpretor.LineProcessors
                 },
                 new x12field()
                 {
+                    FieldCode = "BEG06",
                     Ordinal = 6,
                     FieldName = "Contract Number",
                     Format = x12fieldFormat.AlphaNumeric,
