@@ -23,7 +23,7 @@ namespace x12wasm.Formtters
             Formatters.Add(new ChangeColor("N1", new int[1] { 4 }, newColor));
             Formatters.Add(new ChangeColor("BEG", new int[1] { 3 }, newColor));
         }
-        public void FormatLine(x12lineResult result)
+        public void FormatLine(x12lineResult result, string mode)
         {
             foreach (var formatter in Formatters)
             {

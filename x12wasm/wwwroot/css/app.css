@@ -61,12 +61,19 @@ a, .btn-link {
     height:600px;
 }
 
-.flex-item-left {
-    background-color: #f1f1f1;
+.flex-item-left {    
     padding: 10px;
     flex: 1;
     overflow-y: auto;
     height: 700px;
+}
+
+.flex-item-left-light {
+    background-color: #f1f1f1;
+}
+
+.flex-item-left-dark {
+    background-color: black;
 }
 
 .flex-item-right {
@@ -85,23 +92,13 @@ a, .btn-link {
 
 /**********************************************************************/
 
-.fieldValue {
-    display:inline-block;
-    margin:0px;
-}
-
-.lineInfo {
-    margin-left: 10px;
-    font-weight: bold;
-    display: inline-block;
-}
 
 .noHighlight {
-    background-color: none;
+    background-color: inherit;
 }
 
 .highlight {
-    background-color: yellow;
+    background-color: yellow !important;
 }
 
 .drag-drop-zone {
@@ -144,11 +141,62 @@ a, .btn-link {
 }
 
 .section1 {
-    background-color:white;
-    color:blue;
+    /* background-color:white; */
+    color: blue;
 }
 
 .section2 {
-    background-color: white;
+    /* background-color: white; */ 
     color: red;
+}
+
+
+.fieldValue {
+    display: inline-block;
+    margin: 0px;
+    color: black;
+}
+
+    .fieldValue .fieldDefault-light {
+        color: black !important;
+    }
+
+    .fieldValue .fieldDefault-dark {
+        color: darkgray !important;
+    }
+
+    .fieldValue .fieldFocused-light {
+        color: black !important;
+    }
+
+    .fieldValue .fieldFocused-dark {
+        color: green !important;
+    }
+
+    .fieldValue .fieldDefocused-light {
+        color: silver !important;
+    }
+
+    .fieldValue .fieldDefocused-dark {
+        color: darkgray !important;
+    }
+
+.lineSuffix  {
+    margin-left: 10px;
+    display: inline-block;
+    font-style: italic;
+}
+
+    .lineSuffix.lineSuffix-light {
+        color: black !important;
+    }
+
+    .lineSuffix.lineSuffix-dark {
+        color: darkgray !important;
+    }
+
+
+.seperator {
+    display: inline-block;
+    margin-left: 1px;
 }

@@ -4,21 +4,26 @@
 @using System.IO;
 @using x12interpretor;
 @using x12interpretor.Models;
-@using x12wasm.Formtters; 
+@using x12wasm.Formtters;
 
 <h1>X12 EDI Interpretor</h1>
-Mode: <select @onchange=@selectMode>
+Mode: <select @onchange=@selectLightDark>
+    <option value="Light">Light</option>
+    <option value="Dark">Dark</option>
+</select>&nbsp;
+Formatter: <select @onchange=@selectMode>
     <option value="Default">Default</option>
     <option value="Focus850">850 Focus</option>
-    <option value="PO1">PO1 Highlighter</option>
+    <option value="Focus832">832 Focus</option>
 </select>
+
 <div class="drag-drop-zone">
     <InputFile OnChange=@fileChange multiple></InputFile>
     @((MarkupString)fileDragDrop)
 </div>
 
 <div class="flex-container" @ondrop:preventDefault="true">
-    <div class="flex-item-left" ondrop="event.preventDefault()">
+    <div class="flex-item-left flex-item-left-light" ondrop="event.preventDefault()">
         @* will I need a horizontal scroll bar? *@
         <div class="btn-group" role="group">
             @foreach (var result in ResultSet)
@@ -58,6 +63,8 @@ Mode: <select @onchange=@selectMode>
     // details.razor -- used as @ref to send info from mouse events
     private Details details;
 
+    private string currentMode = "light";
+
     public Index()
     {
         ResultSet = new List<x12interpretor.Models.x12fileResult>();
@@ -87,15 +94,55 @@ Mode: <select @onchange=@selectMode>
         currentFormatter = e.Value.ToString() switch
         {
             "PO1" => new SectionFormatter("PO1", "PO1"),
-            "Focus850" => new FocusModeLineFormatter(),
+            "Focus850" => new FocusModeClassLineFormatter(),
             _ => new DefaultLineFormatter()
         };
 
+        if (e.Value.ToString() == "PO1")
+            showMissing();
+
+        updateAllResultsMode();
+    }
+
+    private async Task selectLightDark(ChangeEventArgs e)
+    {
+        currentMode = e.Value.ToString().ToLower();
+
+        updateAllResultsMode();
+
+        if (currentMode == "dark")
+            await JSRuntime.InvokeVoidAsync("modes.setDark");
+        else
+            await JSRuntime.InvokeVoidAsync("modes.setLight");
+    }
+
+    private void updateAllResultsMode()
+    {
         foreach (var result in ResultSet)
         {
             setModeOnResult(result);
         }
     }
+
+    private void showMissing()
+    {
+        foreach (var file in ResultSet)
+        {
+            foreach (var line in file.Lines)
+            {
+
+                foreach (var field in line.FieldResults ?? new())
+                {
+                    // if a required field is missing
+                    if (field.FileValue is null && field.Field is not null && field.Field.IsRequired)
+                    {
+                        field.DisplayValue = "<span style='color:orange;'>(required field missing)</span>";
+                    }
+                }
+            }
+        }
+    }
+
 
     // change a result UI mode
     private void setModeOnResult(x12fileResult result)
@@ -105,7 +152,7 @@ Mode: <select @onchange=@selectMode>
         {
             foreach (var line in result.Lines)
             {
-                ((ILineFormatter)currentFormatter).FormatLine(line);
+                ((ILineFormatter)currentFormatter).FormatLine(line, currentMode);
             }
         }
         else

@@ -2,22 +2,19 @@
 
 <div>
     @if (Line is not null && Line.FieldResults is not null)
-    {       
+    {
         @foreach (var field in Line.FieldResults)
         {
-            <X12TextField 
-                          FieldResult=@field
-                          LineCode=@Line.LineCode                          
-
+            <X12TextField FieldResult=@field
+                          LineCode=@Line.LineCode
                           Clicked=@clicked
                           LineInfo=@setInfo
-                          MouseOvered=@mouseOvered    
-                          />
+                          MouseOvered=@mouseOvered />
         }
-        
-        <div class="lineInfo">@Line.LineSuffix</div>       
+
+        @((MarkupString)@Line.LineSuffix)
     }
-</div>
+    </div>
 
 @code {
     [Parameter]

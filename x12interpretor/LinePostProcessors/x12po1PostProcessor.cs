@@ -43,13 +43,13 @@ namespace x12interpretor.LinePostProcessors
             if (ndc is null)
             {
                 result.ExtraValues.Add("openFDA", "Not founnd");
-                lineResult.LineSuffix = "ndc not found";
+                lineResult.OriginalLineSuffix = "ndc not found";
             }
             else
             {
                 var data = $"{ndc.results[0].brand_name} - {ndc.results[0].active_ingredients[0].name} {ndc.results[0].active_ingredients[0].strength}";
                 result.ExtraValues.Add("openFDA", data);
-                lineResult.LineSuffix = data;
+                lineResult.OriginalLineSuffix = data;
             }
         }
 

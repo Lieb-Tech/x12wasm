@@ -15,6 +15,7 @@ namespace x12interpretor.Models
         public string OriginalValue { get; set; }
         public List<x12fieldResult> FieldResults { get; set; }
 
+        public string OriginalLineSuffix { get; set; }
         public string LineSuffix { get; set; }
     }
 }

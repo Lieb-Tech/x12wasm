@@ -13,6 +13,44 @@
     <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
 
     <script>
+        const fields = [
+            "fieldDefault",
+            "lineSuffix",
+            "fieldDefocused",
+            "fieldFocused",
+            "flex-item-left"
+        ];
+
+        window.modes = {            
+            setDark: function () {
+                let left = document.getElementsByClassName("flex-item-left")[0];
+                left.classList.remove("flex-item-left-light");
+                left.classList.add("flex-item-left-dark");
+
+                fields.map(function (f) {
+                    let els = document.getElementsByClassName(f + "-light");
+                    Array.from(els).forEach(function (v) {
+                        v.classList.add(f + "-dark");
+                        v.classList.remove(f + "-light");
+                    });
+                });                
+            },
+
+            setLight: function () {
+                let left = document.getElementsByClassName("flex-item-left")[0];
+                left.classList.add("flex-item-left-light");
+                left.classList.remove("flex-item-left-dark");
+
+                fields.map(function (f) {
+                    let els = document.getElementsByClassName(f + "-dark");
+                    Array.from(els).forEach(function (v) {
+                        v.classList.remove(f + "-dark");
+                        v.classList.add(f + "-light");
+                    });
+                });
+            },
+        }
+
         window.activeButton = {
             setActive: function (qry) {
                 $(".btn-primary").removeClass("btn-primary");

@@ -1,11 +1,11 @@
 ﻿@inject IJSRuntime JSRuntime
-
-<div class="fieldValue @(isOver ? "highlight" : "noHighlight")"
+@using x12interpretor.Models
+ 
+<div class="fieldValue @(isOver ? "highlight" : "")"
      @onmouseover=@onMouseOver
      @onmouseout=@onMouseLeave
-     @onclick=@onClick
-     data-toggle="tooltip" data-placement="right">
-    @((MarkupString)FieldResult.DisplayValue)*
+     @onclick=@onClick>
+    @((MarkupString)FieldResult.DisplayValue)<div class="seperator">*</div>
 </div>
 @code {
     protected string fieldFormattedInfo { get; set; }
@@ -22,9 +22,9 @@
     [Parameter]
     public EventCallback<string> Clicked { get; set; }
 
-
     [Parameter]
-    public x12interpretor.Models.x12fieldResult FieldResult { get; set; }
+    public x12fieldResult FieldResult { get; set; }
+
 
     [Parameter]
     public string LineCode { get; set; }
