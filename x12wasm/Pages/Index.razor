@@ -6,6 +6,7 @@
 @using x12FileParser.Models;
 @using x12wasm.Formtters;
 @using x12wasm.Models;
+@using x12wasm.Components;
 
 <h1 style="margin:10px;">X12 Inspector</h1>
 <div>
@@ -38,7 +39,7 @@
                 <button id=@(result.FileName.GetHashCode()) class="btn btn-active" @onclick="(e) => tabClick(result.FileName, e)">@result.FileName</button>
             }
         </div>
-        <br />        
+        <br />
         @if (CurrentSet is not null)
         {
             if (RecapMode)
@@ -116,7 +117,7 @@
         {
             var s850 = new x12FileParser.SummaryGenerator.Summary850();
             CurrentRecap = s850.ProcessFile(CurrentSet.ToX12FileResult());
-        }   
+        }
     }
 
     void selectStyle(ChangeEventArgs e)
