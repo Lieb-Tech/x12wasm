@@ -1,6 +1,5 @@
-﻿
-using System.Linq;
-using x12interpretor.Models;
+﻿using System.Linq;
+using x12wasm.Models;
 
 namespace x12wasm.Formtters
 {
@@ -16,7 +15,7 @@ namespace x12wasm.Formtters
             _firstLineCode = firstLineCode;
             _lastLineCode = lastLineCode;
         }
-        public void FormatFile(x12fileResult file)
+        public void FormatFile(FileResult file)
         {
             bool inSection = false;
             foreach (var line in file.Lines)

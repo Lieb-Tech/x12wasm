@@ -2,63 +2,79 @@
 @inject IJSRuntime JSRuntime
 
 @using System.IO;
-@using x12interpretor;
-@using x12interpretor.Models;
+@using x12FileParser;
+@using x12FileParser.Models;
 @using x12wasm.Formtters;
+@using x12wasm.Models;
 
-<h1>X12 EDI Interpretor</h1>
-Mode: <select @onchange=@selectLightDark>
-    <option value="Light">Light</option>
-    <option value="Dark">Dark</option>
-</select>&nbsp;
-Formatter: <select @onchange=@selectMode>
-    <option value="Default">Default</option>
-    <option value="Focus850">850 Focus</option>
-    <option value="Focus832">832 Focus</option>
-</select>
-
-<div class="drag-drop-zone">
-    <InputFile OnChange=@fileChange multiple></InputFile>
-    @((MarkupString)fileDragDrop)
+<h1 style="margin:10px;">X12 Inspector</h1>
+<div>
+    Mode: <select @onchange=@selectLightDark>
+        slee
+        <option value="Light">Light</option>
+        <option value="Dark">Dark</option>
+    </select>&nbsp;
+    Formatter: <select @onchange=@selectMode>
+        <option value="Default">Default</option>
+        <option value="Focus850">850 Focus</option>
+        <option value="Focus832">832 Focus</option>
+    </select>
+    &nbsp;
+    Style: <select @onchange=@selectStyle>
+        <option value="Default">All Fields</option>
+        <option value="Summary">Summary</option>
+    </select>
+    <div style="display:inline-block;" class="drag-drop-zone">
+        <InputFile OnChange=@fileChange multiple></InputFile>
+        @((MarkupString)FileDragDrop)
+    </div>
 </div>
-
 <div class="flex-container" @ondrop:preventDefault="true">
     <div class="flex-item-left flex-item-left-light" ondrop="event.preventDefault()">
-        @* will I need a horizontal scroll bar? *@
+        @* will I need a horizontal scroll bar for the "tabs"? *@
         <div class="btn-group" role="group">
             @foreach (var result in ResultSet)
             {
                 <button id=@(result.FileName.GetHashCode()) class="btn btn-active" @onclick="(e) => tabClick(result.FileName, e)">@result.FileName</button>
             }
         </div>
-        <br />
-        <br />
+        <br />        
         @if (CurrentSet is not null)
         {
-            foreach (var line in CurrentSet.Lines)
+            if (RecapMode)
             {
-                <X12TextLine MouseOvered=@mouseOvered Clicked=@clicked Line=line></X12TextLine>
+                <Recap RecapData=@CurrentRecap Mode=@currentMode> </Recap>
+            }
+            else
+            {
+                foreach (var line in CurrentSet.Lines)
+                {
+                    <X12TextLine MouseOvered=@mouseOvered Clicked=@clicked Line=line></X12TextLine>
+                }
             }
         }
     </div>
     <div class="flex-item-right">
         <Details @ref=@details> </Details>
-
     </div>
 </div>
 
 @code {
-    private string fileDragDrop { get; set; }
+
+    private string FileDragDrop { get; set; }
     private Interpretor interp = new Interpretor();
+
+    private bool RecapMode;
 
     // default mode
     private IFormatter currentFormatter = new DefaultLineFormatter();
 
     // all the files loaded
-    public List<x12fileResult> ResultSet { get; set; }
+    public List<FileResult> ResultSet { get; set; }
 
     // currently displayed tab
-    public x12fileResult CurrentSet { get; set; }
+    public FileResult CurrentSet { get; set; }
+    public x12summaryResult CurrentRecap { get; set; } = new();
 
     // details.razor -- used as @ref to send info from mouse events
     private Details details;
@@ -67,8 +83,10 @@ Formatter: <select @onchange=@selectMode>
 
     public Index()
     {
-        ResultSet = new List<x12interpretor.Models.x12fileResult>();
-        fileDragDrop = "You can drag/drop multiple 850 files &nbsp;<em>here</em>, or click to browse for the file.";
+        RecapMode = false;
+        ResultSet = new List<FileResult>();
+        FileDragDrop = "You can drag/drop multiple 850 files &nbsp;<em>here</em>, or click to browse for the file.";
+        JSRuntime.InvokeVoidAsync("resized");
     }
 
     // send mouse events to Details
@@ -86,6 +104,32 @@ Formatter: <select @onchange=@selectMode>
     public async Task tabClick(string file, MouseEventArgs args)
     {
         await updateCurrent(ResultSet.First(z => z.FileName == file));
+
+        StateHasChanged();
+        JSRuntime.InvokeVoidAsync("resized");
+    }
+
+
+    void generateRecap()
+    {
+        if (CurrentSet is not null)
+        {
+            var s850 = new x12FileParser.SummaryGenerator.Summary850();
+            CurrentRecap = s850.ProcessFile(CurrentSet.ToX12FileResult());
+        }   
+    }
+
+    void selectStyle(ChangeEventArgs e)
+    {
+        RecapMode = !RecapMode;
+
+        if (RecapMode)
+            generateRecap();
+
+        updateAllResultsMode();
+
+        StateHasChanged();
+        JSRuntime.InvokeVoidAsync("resized");
     }
 
     // change the UI mode for all loaded files
@@ -102,6 +146,8 @@ Formatter: <select @onchange=@selectMode>
             showMissing();
 
         updateAllResultsMode();
+        StateHasChanged();
+        JSRuntime.InvokeVoidAsync("resized");
     }
 
     private async Task selectLightDark(ChangeEventArgs e)
@@ -130,7 +176,6 @@ Formatter: <select @onchange=@selectMode>
         {
             foreach (var line in file.Lines)
             {
-
                 foreach (var field in line.FieldResults ?? new())
                 {
                     // if a required field is missing
@@ -145,7 +190,7 @@ Formatter: <select @onchange=@selectMode>
 
 
     // change a result UI mode
-    private void setModeOnResult(x12fileResult result)
+    private void setModeOnResult(FileResult result)
     {
         // later on - make this more dynamic
         if (currentFormatter is ILineFormatter)
@@ -159,13 +204,18 @@ Formatter: <select @onchange=@selectMode>
         {
             ((IFileFormatter)currentFormatter).FormatFile(result);
         }
+
     }
 
-    private async Task updateCurrent(x12fileResult result)
+    private async Task updateCurrent(FileResult result)
     {
         // update the css classes for the buttons
         await JSRuntime.InvokeVoidAsync("activeButton.setActive", "#" + result.FileName.GetHashCode());
         CurrentSet = result;
+        if (RecapMode) generateRecap();
+
+        StateHasChanged();
+        await JSRuntime.InvokeVoidAsync("resized");
     }
 
     // files dropped or browsed for - process
@@ -173,7 +223,7 @@ Formatter: <select @onchange=@selectMode>
     {
         var files = dea.GetMultipleFiles(5);
 
-        fileDragDrop = $"Processing {files.Count} file(s)";
+        FileDragDrop = $"Processing {files.Count} file(s)";
 
         foreach (var file in files)
         {
@@ -182,11 +232,13 @@ Formatter: <select @onchange=@selectMode>
 
         StateHasChanged();
 
-        fileDragDrop = "You can drag/drop multiple 850 files &nbsp;<em>here</em>, or click to browse for the file.";
+        FileDragDrop = "You can drag/drop multiple 850 files &nbsp;<em>here</em>, or click to browse for the file.";
         StateHasChanged();
 
         // make first file loaded the active
         await updateCurrent(ResultSet.Last());
+
+        await JSRuntime.InvokeVoidAsync("resized");
         StateHasChanged();
 
     }
@@ -199,7 +251,9 @@ Formatter: <select @onchange=@selectMode>
         var info = await rdr.ReadToEndAsync();
 
         // process the data
-        var data = await interp.ProcessFileAsync(info);
+        var results = await interp.ProcessFileAsync(info);
+
+        var data = new FileResult(results);
         data.FileName = file.Name;
 
         // update display field to match current selected mode

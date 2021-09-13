@@ -1,4 +1,4 @@
-﻿@using x12interpretor.Models
+﻿@using x12wasm.Models
 
 <div>
     @if (Line is not null && Line.FieldResults is not null)
@@ -24,7 +24,7 @@
     public EventCallback<string> Clicked { get; set; }
 
     [Parameter]
-    public x12lineResult Line { get; set; }
+    public LineResult Line { get; set; }
 
     private string LineInfo { get; set; }
 
@@ -43,3 +43,4 @@
         LineInfo = info;
     }
 }
+    

@@ -1,10 +1,10 @@
-﻿using x12interpretor.Models;
+﻿using x12wasm.Models;
 
 namespace x12wasm.Formtters
 {
     public class DefaultLineFormatter: IFormatter, ILineFormatter
     {
-        public void FormatLine(x12lineResult result, string mode)
+        public void FormatLine(LineResult result, string mode)
         {
             if (result.FieldResults is null)
                 return;

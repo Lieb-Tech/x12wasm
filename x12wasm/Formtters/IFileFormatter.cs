@@ -1,9 +1,9 @@
-﻿using x12interpretor.Models;
+﻿using x12wasm.Models;
 
 namespace x12wasm.Formtters
 {
     public interface IFileFormatter
     {
-        void FormatFile(x12fileResult file);
+        void FormatFile(FileResult file);
     }
 }

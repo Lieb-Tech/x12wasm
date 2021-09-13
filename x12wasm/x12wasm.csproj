@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\x12interpretor\x12interpretor.csproj" />
+    <ProjectReference Include="..\..\x12Inspector\x12FileParser\x12FileParser.csproj" />
   </ItemGroup>
 
   <ItemGroup>

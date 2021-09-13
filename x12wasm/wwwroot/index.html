@@ -18,7 +18,8 @@
             "lineSuffix",
             "fieldDefocused",
             "fieldFocused",
-            "flex-item-left"
+            "flex-item-left",
+            "seperator"
         ];
 
         window.modes = {            
@@ -26,6 +27,11 @@
                 let left = document.getElementsByClassName("flex-item-left")[0];
                 left.classList.remove("flex-item-left-light");
                 left.classList.add("flex-item-left-dark");
+
+                var btns = document.getElementsByClassName("btn-active");
+                Array.from(btns).forEach(function (v) {                    
+                    v.classList.add("btn-dark");
+                });
 
                 fields.map(function (f) {
                     let els = document.getElementsByClassName(f + "-light");
@@ -40,6 +46,11 @@
                 let left = document.getElementsByClassName("flex-item-left")[0];
                 left.classList.add("flex-item-left-light");
                 left.classList.remove("flex-item-left-dark");
+
+                var btns = document.getElementsByClassName("btn-active");
+                Array.from(btns).forEach(function (v) {
+                    v.classList.remove("btn-dark");
+                });
 
                 fields.map(function (f) {
                     let els = document.getElementsByClassName(f + "-dark");
@@ -69,10 +80,40 @@
                 });
             }
         }
+
+
+        function resized() {
+            var main = document.getElementsByClassName("flex-container")[0];
+
+            if (main !== undefined) {
+                var height = 0;
+                var body = window.document.body;
+                if (window.innerHeight) {
+                    height = window.innerHeight;
+                } else if (body.parentElement.clientHeight) {
+                    height = body.parentElement.clientHeight;
+                } else if (body && body.clientHeight) {
+                    height = body.clientHeight;
+                }
+
+                let newHeight = ((height - main.offsetTop - 45) + "px");
+                main.style.height = newHeight;
+                document.title = height + " : " + main.offsetTop + " : " + main.style.height;
+
+                setTimeout(function () {
+                    var item = document.getElementById("recapItems");
+
+                    if (item) {
+                        item.style.height = (height - item.offsetTop - 45) + "px";
+                        document.title = height + " : " + main.offsetTop + " : " + main.style.height + " : " + item.offsetTop + " : " + item.style.height;
+                    }
+                }, 50);
+            }
+        }
     </script>
 </head>
 
-<body>
+<body onresize="resized()">
     <div id="app">Loading...</div>
 
     <div id="blazor-error-ui">

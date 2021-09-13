@@ -19,8 +19,4 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\x12interpretor\x12interpretor.csproj" />
-  </ItemGroup>
-
 </Project>

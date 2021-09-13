@@ -1,10 +1,9 @@
-﻿
-using x12interpretor.Models;
+﻿using x12wasm.Models;
 
 namespace x12wasm.Formtters
 {
     public interface ILineFormatter
     {
-        void FormatLine(x12lineResult result, string mode);
+        void FormatLine(LineResult result, string mode);
     }
 }

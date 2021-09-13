@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using x12interpretor.Models;
 using x12wasm.FieldFormatters;
+using x12wasm.Models;
 
 namespace x12wasm.Formtters
 {
@@ -15,7 +15,7 @@ namespace x12wasm.Formtters
         {
             
         }
-        public void FormatLine(x12lineResult result, string mode)
+        public void FormatLine(LineResult result, string mode)
         {
             var classNameFocused = $"{classNameFocused_base}{mode}";
             var classNameDefocused = $"{classNameDefocused_base}{mode}";

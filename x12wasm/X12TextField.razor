@@ -1,11 +1,11 @@
 ﻿@inject IJSRuntime JSRuntime
-@using x12interpretor.Models
- 
+@using x12wasm.Models
+
 <div class="fieldValue @(isOver ? "highlight" : "")"
      @onmouseover=@onMouseOver
      @onmouseout=@onMouseLeave
-     @onclick=@onClick>
-    @((MarkupString)FieldResult.DisplayValue)<div class="seperator">*</div>
+     @onclick=@onClick>     
+    @((MarkupString)fieldResult.DisplayValue)<div class="seperator">*</div>
 </div>
 @code {
     protected string fieldFormattedInfo { get; set; }
@@ -22,15 +22,31 @@
     [Parameter]
     public EventCallback<string> Clicked { get; set; }
 
+    private FieldResult fieldResult;
     [Parameter]
-    public x12fieldResult FieldResult { get; set; }
+    public FieldResult FieldResult {
+        get
+        {
+            return fieldResult;
+        }
+        set
+        {
+            fieldResult = value;
+
+            if (fieldResult is null)
+                fieldResult = new FieldResult(null, "");
+
+            if (string.IsNullOrWhiteSpace(fieldResult.DisplayValue))
+                fieldResult.DisplayValue = "&nsbp;";
+        }
+    }
 
 
     [Parameter]
     public string LineCode { get; set; }
 
 
-    // mouse events 
+    // mouse events
     public async Task onClick(MouseEventArgs args)
     {
         await ensureFormattedInfo();
@@ -61,7 +77,7 @@
             return;
         }
 
-        if (FieldResult.Field.Ordinal == 0)
+        if (fieldResult.Field.Ordinal == 0)
             // if not the initial LineCode
             generateLineCode();
         else
@@ -75,20 +91,22 @@
 
     private string generateFieldInfo(string mapped)
     {
+        var str = fieldResult.Field.Format.ToString("G");
         System.Text.StringBuilder result = new System.Text.StringBuilder($@"<table>
-<tr><td>Line:</td><td>{LineCode}</td></tr>
-<tr><td>Field:</td><td>{FieldResult.Field.FieldName}</td></tr>
+<tr><td>Line:</td><td>{fieldResult.LineDescription}</td></tr>
+<tr><td>Field:</td><td>({fieldResult.Field.FieldCode}) <b>{fieldResult.Field.FieldName}</b></td></tr>
 <tr><td colspan=2></br></td></tr>
-<tr><td>Min Len:</td><td>{FieldResult.Field.MinLen}</td></tr>
-<tr><td>Max Len:</td><td>{FieldResult.Field.MaxLen}</td></tr>
-<tr><td>Required:</td><td>{FieldResult.Field.IsRequired}</td></tr>
+<tr><td>Min Len:</td><td>{fieldResult.Field.MinLen}</td></tr>
+<tr><td>Max Len:</td><td>{fieldResult.Field.MaxLen}</td></tr>
+<tr><td>Required:</td><td>{fieldResult.Field.IsRequired}</td></tr>
+<tr><td>Type::</td><td>{str}</td></tr>
 <tr><td colspan=2></br></td></tr>
-<tr><td>Value:</td><td >{FieldResult.FileValue ?? ""}</td></tr>");
+<tr><td>Value:</td><td ><b>{fieldResult.FileValue ?? "<em>None provided</em>"}</b></td></tr>");
 
-        if (FieldResult.ExtraValues is not null)
+        if (fieldResult.ExtraValues is not null && fieldResult.ExtraValues.Any())
         {
             result.Append("<tr><td colspan=2></br></td></tr>");
-            foreach (var pp in FieldResult.ExtraValues)
+            foreach (var pp in fieldResult.ExtraValues)
             {
                 result.Append($"<tr><td>{pp.Key}</td><td>{pp.Value}</td></tr>");
             }
@@ -98,12 +116,12 @@
         if (!string.IsNullOrWhiteSpace(mapped))
             result.Append($"<tr><td colspan=2></br></td></tr><tr><td>Value Code:</td><td>{mapped}</td></tr>");
 
-        if (FieldResult.Field.ValueMap is not null && FieldResult.Field.ValueMap.Any())
+        if (fieldResult.Field.ValueMap is not null && fieldResult.Field.ValueMap.Any())
         {
             result.Append("<tr><td colspan=2></br></td></tr><tr><td colspan=2><div class='valueMapTable'><table>");
-            foreach (var pp in FieldResult.Field.ValueMap.OrderBy(z => z.Key))
+            foreach (var pp in fieldResult.Field.ValueMap.OrderBy(z => z.Key))
             {
-                if (FieldResult.FileValue == pp.Key)
+                if (fieldResult.FileValue == pp.Key)
                     result.Append($"<tr><td class='detailCode matched'>{pp.Key}</td><td class='matched'>{pp.Value}</td></tr>");
                 else
                     result.Append($"<tr><td class='detailCode'>{pp.Key}</td><td>{pp.Value}</td></tr>");
@@ -116,11 +134,11 @@
 
     private void doNonNDC()
     {
-        // if there's a map, then check if in there        
-        if ( FieldResult.FileValue is not null
-            && FieldResult.Field.ValueMap is not null
-            && FieldResult.Field.ValueMap.ContainsKey(FieldResult.FileValue.Trim()))
-            fieldFormattedInfo = generateFieldInfo(FieldResult.Field.ValueMap[FieldResult.FileValue.Trim()]);
+        // if there's a map, then check if in there
+        if (fieldResult.FileValue is not null
+            && fieldResult.Field.ValueMap is not null
+            && fieldResult.Field.ValueMap.ContainsKey(fieldResult.FileValue.Trim()))
+            fieldFormattedInfo = generateFieldInfo(fieldResult.Field.ValueMap[fieldResult.FileValue.Trim()]);
         else
             // otherwise just use default
             fieldFormattedInfo = generateFieldInfo(null);

@@ -61,11 +61,10 @@ a, .btn-link {
     height:600px;
 }
 
-.flex-item-left {    
+.flex-item-left {
     padding: 10px;
     flex: 1;
     overflow-y: auto;
-    height: 700px;
 }
 
 .flex-item-left-light {
@@ -80,7 +79,6 @@ a, .btn-link {
     background-color: #f1f1f1;
     padding: 10px;
     flex: 0 0 500px;
-    height: 700px;
 }
 
 /* Responsive layout - makes a one column-layout instead of two-column layout */
@@ -155,6 +153,7 @@ a, .btn-link {
     display: inline-block;
     margin: 0px;
     color: black;
+    cursor: pointer
 }
 
     .fieldValue .fieldDefault-light {
@@ -170,7 +169,7 @@ a, .btn-link {
     }
 
     .fieldValue .fieldFocused-dark {
-        color: green !important;
+        color: lawngreen !important;
     }
 
     .fieldValue .fieldDefocused-light {
@@ -178,7 +177,7 @@ a, .btn-link {
     }
 
     .fieldValue .fieldDefocused-dark {
-        color: darkgray !important;
+        color: darkslategray !important;
     }
 
 .lineSuffix  {
@@ -199,4 +198,15 @@ a, .btn-link {
 .seperator {
     display: inline-block;
     margin-left: 1px;
+}
+    .seperator.seperator-light {
+        color:silver !important;
+    }
+
+    .seperator.seperator-dark {
+        color:darkgray !important;
+    }
+
+.btn-dark {
+    color: white !important;
 }

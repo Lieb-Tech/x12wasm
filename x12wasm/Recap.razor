@@ -1,0 +1,31 @@
+﻿@using x12FileParser.Models
+@inject IJSRuntime JSRuntime
+
+<h4 class="fieldDefault-@Mode">Summary</h4>
+<div>
+    @foreach (var line in RecapData.HeaderLines)
+    {
+        <div><div class="fieldValue "><div class="fieldDefault-@Mode">@line</div></div></div>
+    }
+</div>
+<br />
+<h4 class="fieldDefault-@Mode">Items</h4>
+<div id="recapItems" style="overflow-y:auto;height:100%;">
+    @foreach (var line in RecapData.SummaryLines)
+    {
+        <div><div class="fieldValue "><div class="fieldDefault-@Mode">@line</div></div></div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Mode { get; set; }
+
+    [Parameter]
+    public x12summaryResult RecapData { get; set; }
+
+    public Recap()
+    {
+        JSRuntime.InvokeVoidAsync("resized");
+    }
+}

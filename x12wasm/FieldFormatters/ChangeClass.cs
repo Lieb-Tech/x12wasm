@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using x12interpretor.Models;
+using x12wasm.Models;
 
 namespace x12wasm.FieldFormatters
 {
@@ -18,7 +18,7 @@ namespace x12wasm.FieldFormatters
             _code = lineCode;
             _ordinalsToSkip = ordinalsToSkip ?? new int[0];
         }
-        public void UpdateField(x12lineResult lineResult, x12fieldResult fieldResult)
+        public void UpdateField(LineResult lineResult, FieldResult fieldResult)
         {
             if (lineResult.LineCode != _code)
                 return;
