@@ -11,10 +11,13 @@ Project Functionality
 - Mouse over highlighting - makes the data visually standout from the many field terminators
 - Mouse over details - shows information about the segment in a details pane, include descriptions for the segment
 - If the field is code enumeration, the details pane will list other possible values, and the accompanying description
+- Ability to change format the output to highlight different views (dark/light mode; 850 focused)
+- This is CSS driven, but in future will be extensible
+- Does an API lookup on a value to get external data - shows in line and in the details pane.
 
 Project aspects
 - As mentioned this Blazor Wasm project, so all the logic run on the browser - no need for a server, other than to host the files.
 - The core logic to parse the file is a seperate C# class library, which is also used in my x12winui project. 
 - Follows the MVVM pattern.
 - Items on the page are broken into Razor components for re-use and clean code
-- 
+- Has some Unit tests to verify the programming model allows for good coverage
